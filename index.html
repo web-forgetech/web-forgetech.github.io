@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Forgetech, Lahore: PLC control panels, embedded electronics and test rigs.">
+<title>Forgetech</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a machine rating plate as the hero, then a control-panel grid of services, project log, process line, contact. */
+:root {
+  --bg: #ECEEEF;
+  --surface: #F7F8F8;
+  --plate: #DADFE2;
+  --ink: #1A1F24;
+  --muted: #56606A;
+  --line: #C3CAD0;
+  --accent: #D9500B;
+  --accent-ink: #FFFFFF;
+  --ok: #2E7D4F;
+  --stripe-dark: #1A1F24;
+  --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171A; --surface: #1C2024; --plate: #252A2F; --ink: #E5E8EA; --muted: #97A0A8;
+    --line: #353C42; --accent: #FF6A1F; --accent-ink: #14171A; --ok: #5CC489; --stripe-dark: #0C0E10;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171A; --surface: #1C2024; --plate: #252A2F; --ink: #E5E8EA; --muted: #97A0A8;
+  --line: #353C42; --accent: #FF6A1F; --accent-ink: #14171A; --ok: #5CC489; --stripe-dark: #0C0E10;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.band { padding-block: 72px; border-top: 1px solid var(--line); }
+
+/* header */
+header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand-mark { width: 30px; height: 30px; background: var(--accent); display: grid; place-items: center; }
+.brand-mark span { width: 12px; height: 12px; border: 3px solid var(--accent-ink); }
+.brand-name { font-family: var(--display); font-weight: 700; font-size: 26px; letter-spacing: 0.06em; text-transform: uppercase; }
+nav.links { display: flex; gap: 22px; flex-wrap: wrap; }
+nav.links a { text-decoration: none; font-family: var(--display); font-weight: 600; font-size: 17px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+nav.links a:hover { color: var(--ink); }
+.hazard { height: 8px; background: repeating-linear-gradient(-45deg, var(--accent) 0 14px, var(--stripe-dark) 14px 28px); }
+
+/* hero */
+.hero { padding-block: 64px 72px; }
+.hero .wrap { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 56px; align-items: center; }
+.eyebrow { font-family: var(--mono); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(44px, 7vw, 84px); line-height: 0.95; letter-spacing: 0.01em; text-transform: uppercase; margin: 0 0 22px; text-wrap: balance; }
+.lede { font-size: 19px; color: var(--muted); max-width: 34em; margin: 0 0 30px; }
+.ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; border: 2px solid var(--ink); transition: background .15s, color .15s; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.btn.ghost:hover { background: var(--ink); color: var(--bg); }
+
+/* rating plate */
+.plate { position: relative; background: var(--plate); border: 1px solid var(--line); padding: 30px 30px 26px; font-family: var(--mono); font-size: 14px; }
+.plate::before, .plate::after, .plate .rivets::before, .plate .rivets::after { content: ""; position: absolute; width: 10px; height: 10px; border-radius: 50%; background: var(--line); box-shadow: inset 0 0 0 2px var(--bg); }
+.plate::before { top: 10px; left: 10px; } .plate::after { top: 10px; right: 10px; }
+.plate .rivets::before { bottom: 10px; left: 10px; } .plate .rivets::after { bottom: 10px; right: 10px; }
+.plate-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 6px; }
+.plate-head strong { font-family: var(--display); font-size: 26px; letter-spacing: 0.1em; text-transform: uppercase; }
+.plate-head span { font-size: 12px; color: var(--muted); letter-spacing: 0.08em; }
+.plate dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); }
+.plate dt, .plate dd { margin: 0; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+.plate dt { color: var(--muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.1em; padding-right: 18px; align-self: center; }
+.plate dd { font-weight: 500; }
+.plate .cert { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+.plate .cert span { border: 1px solid var(--ink); padding: 2px 8px; font-size: 12px; letter-spacing: 0.08em; }
+
+/* section heads */
+.sec-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px 56px; align-items: end; margin-bottom: 40px; }
+h2 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 4.5vw, 52px); line-height: 1; text-transform: uppercase; letter-spacing: 0.02em; margin: 0; text-wrap: balance; }
+.sec-head p { margin: 0; color: var(--muted); max-width: 36em; }
+
+/* services */
+.services { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 2px solid var(--ink); border-left: 1px solid var(--line); }
+.svc { padding: 26px 24px 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.svc h3 { font-family: var(--display); font-weight: 600; font-size: 25px; letter-spacing: 0.03em; text-transform: uppercase; margin: 0; line-height: 1.1; }
+.svc p { margin: 0; color: var(--muted); font-size: 15px; }
+.svc .spec { margin-top: auto; padding-top: 12px; font-family: var(--mono); font-size: 12.5px; color: var(--ink); border-top: 1px dashed var(--line); }
+
+/* projects */
+.log { border-top: 2px solid var(--ink); }
+.log-row { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.6fr) 150px; gap: 24px; padding-block: 22px; border-bottom: 1px solid var(--line); align-items: start; }
+.log-row h3 { font-family: var(--display); font-weight: 600; font-size: 24px; text-transform: uppercase; letter-spacing: 0.03em; margin: 0; line-height: 1.15; }
+.log-row p { margin: 0; color: var(--muted); font-size: 15px; }
+.log-row .stack { display: block; margin-top: 8px; font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+.status { justify-self: end; font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.status::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--ok); }
+.status.wip::before { background: var(--accent); }
+
+/* process */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 2px solid var(--ink); counter-reset: step; }
+.steps li { counter-increment: step; padding: 22px 22px 6px 0; min-width: 0; }
+.steps li + li { padding-left: 22px; border-left: 1px solid var(--line); }
+.steps li::before { content: "Step " counter(step); display: block; font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+.steps h3 { font-family: var(--display); font-weight: 600; font-size: 23px; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 6px; }
+.steps p { margin: 0; color: var(--muted); font-size: 15px; }
+
+/* brands */
+.brands { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
+.brands span { font-family: var(--mono); font-size: 13px; padding: 6px 12px; border: 1px solid var(--line); background: var(--surface); }
+
+/* contact */
+.contact { background: var(--ink); color: var(--bg); border-top: none; }
+.contact .wrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 48px; align-items: center; }
+.contact h2 { color: var(--bg); }
+.contact .intro { color: var(--bg); opacity: 0.75; margin: 16px 0 0; max-width: 32em; }
+.panel { border: 1px solid var(--muted); padding: 26px; display: grid; gap: 18px; }
+.field-label { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px; }
+.phone-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.phone { font-family: var(--display); font-weight: 600; font-size: 34px; letter-spacing: 0.04em; user-select: all; }
+.copy { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; background: transparent; color: var(--bg); border: 1px solid var(--bg); padding: 6px 10px; cursor: pointer; }
+.copy:hover { background: var(--bg); color: var(--ink); }
+.contact .btn.primary:hover { background: var(--bg); border-color: var(--bg); color: var(--ink); }
+
+footer { padding-block: 22px; font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 900px) {
+  .hero .wrap, .contact .wrap, .sec-head { grid-template-columns: minmax(0, 1fr); }
+  .services { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .steps li:nth-child(3) { padding-left: 0; border-left: none; }
+  .log-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+  .log-row .status { grid-column: 1 / -1; justify-self: start; }
+}
+@media (max-width: 600px) {
+  .band { padding-block: 52px; }
+  .services, .steps { grid-template-columns: minmax(0, 1fr); }
+  .steps li, .steps li + li { padding-left: 0; border-left: none; border-bottom: 1px solid var(--line); padding-bottom: 18px; }
+  .log-row { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  nav.links { gap: 16px; }
+  .phone { font-size: 28px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+body { margin: 0; }
+img { max-width: 100%; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Forgetech home">
+      <div class="brand-mark" aria-hidden="true"><span></span></div>
+      <div class="brand-name">Forgetech</div>
+    </a>
+    <nav class="links" aria-label="Sections">
+      <a href="#services">Services</a>
+      <a href="#projects">Projects</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+  <div class="hazard" aria-hidden="true"></div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Industrial automation · Lahore</p>
+        <h1>Control systems, designed and wired to work.</h1>
+        <p class="lede">Forgetech builds PLC control panels, embedded electronics and test rigs for workshops and factories. We handle the whole job: sensors, wiring, programming, PC software and commissioning.</p>
+        <div class="ctas">
+          <a class="btn primary" href="#contact">Request a quotation</a>
+          <a class="btn ghost" href="#projects">See our work</a>
+        </div>
+      </div>
+
+      <div class="plate" aria-label="Company rating plate">
+        <div class="rivets" aria-hidden="true"></div>
+        <div class="plate-head"><strong>Forgetech</strong><span>LAHORE · PK</span></div>
+        <dl>
+          <dt>Type</dt><dd>Automation &amp; embedded systems</dd>
+          <dt>PLC</dt><dd>Fatek · Delta · Siemens</dd>
+          <dt>HMI</dt><dd>Weintek · PC software</dd>
+          <dt>Comms</dt><dd>RS-485 · Modbus RTU · Ethernet</dd>
+          <dt>Signals</dt><dd>24 VDC · 4–20 mA · 0–10 V</dd>
+          <dt>MCU</dt><dd>ESP32 · STM32 · Arduino</dd>
+        </dl>
+        <div class="cert"><span>IEC 61131-3</span><span>LADDER</span><span>ST</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="services">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>What we build</h2>
+        <p>One team covers electrical, electronic, mechanical and software work, so a project doesn't stall between contractors.</p>
+      </div>
+      <div class="services">
+        <article class="svc">
+          <h3>PLC &amp; HMI programming</h3>
+          <p>Machine logic, interlocks, high-speed counting and alarms, written to be readable by your maintenance staff.</p>
+          <div class="spec">Fatek · Delta · Siemens S7-1200 · Weintek</div>
+        </article>
+        <article class="svc">
+          <h3>Control panels</h3>
+          <p>Panel design and wiring with proper E-stop circuits, relays, power supplies and labelled terminals.</p>
+          <div class="spec">24 VDC control · DIN rail · relay interfaces</div>
+        </article>
+        <article class="svc">
+          <h3>Embedded electronics</h3>
+          <p>Custom controllers and firmware for products and machines, from wireless devices to data loggers.</p>
+          <div class="spec">ESP32 · STM32 · BLE · ESP-NOW</div>
+        </article>
+        <article class="svc">
+          <h3>PCB design</h3>
+          <p>Schematics and board layout for prototypes and small production runs, sourced from local markets where possible.</p>
+          <div class="spec">Altium Designer · Proteus</div>
+        </article>
+        <article class="svc">
+          <h3>Test &amp; measurement rigs</h3>
+          <p>Systems that measure speed, RPM, weight and fuel flow, with PC software for live graphs and reports.</p>
+          <div class="spec">Encoders · load cells · flow meters · Modbus</div>
+        </article>
+        <article class="svc">
+          <h3>Mechanical &amp; fabrication</h3>
+          <p>Enclosures, brackets and mounts, designed in CAD and made with 3D printing, lathe, welding and sheet metal.</p>
+          <div class="spec">FreeCAD · OpenSCAD · PowerShape</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="projects">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Project log</h2>
+        <p>Selected work, from systems running on site to rigs in development.</p>
+      </div>
+      <div class="log">
+        <div class="log-row">
+          <h3>Fuel flow measurement system</h3>
+          <p>Designed, programmed and installed on site for an industrial client.<span class="stack">Flow sensors · embedded controller</span></p>
+          <span class="status">Delivered</span>
+        </div>
+        <div class="log-row">
+          <h3>Wireless nurse calling system</h3>
+          <p>Bed-side call units that alert the nursing station without running cables through the ward.<span class="stack">Wireless embedded nodes</span></p>
+          <span class="status">Delivered</span>
+        </div>
+        <div class="log-row">
+          <h3>AC automation controller</h3>
+          <p>Automatic control for air-conditioning units.<span class="stack">Embedded controller</span></p>
+          <span class="status">Delivered</span>
+        </div>
+        <div class="log-row">
+          <h3>Motorcycle dynamometer</h3>
+          <p>PLC control and data system for a two-roller inertia dyno for bikes up to 125cc, with encoder, engine RPM and fuel flow inputs.<span class="stack">Fatek FBs-24MC · RS-485 · PC software</span></p>
+          <span class="status wip">In development</span>
+        </div>
+        <div class="log-row">
+          <h3>Load-cell weighing scale</h3>
+          <p>Four-load-cell platform scale with LCD readout, status light and a 3D-printed plate and cover.<span class="stack">ESP32-C3 · HX711 · LCD1602</span></p>
+          <span class="status wip">In development</span>
+        </div>
+        <div class="log-row">
+          <h3>Poultry flock scale</h3>
+          <p>Battery-powered scale for weighing broiler flocks, sending readings to a phone app over Bluetooth.<span class="stack">ESP32 · 20 kg load cell · BLE</span></p>
+          <span class="status wip">In development</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="process">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>How a project runs</h2>
+        <p>You get a written quotation before any work starts, and a working machine at the end.</p>
+      </div>
+      <ol class="steps">
+        <li><h3>Site survey</h3><p>We see the machine, list the inputs and outputs, and agree what it must do.</p></li>
+        <li><h3>Quotation</h3><p>Itemised hardware and service costs, with model numbers and delivery time.</p></li>
+        <li><h3>Build &amp; program</h3><p>Panel wiring, PLC and firmware programming, and bench testing before installation.</p></li>
+        <li><h3>Commissioning</h3><p>Installation, calibration and operator training on site, then support after handover.</p></li>
+      </ol>
+      <div class="brands" aria-label="Hardware we work with">
+        <span>Fatek</span><span>Delta</span><span>Siemens</span><span>Weintek</span><span>ESP32</span><span>STM32</span><span>Modbus RTU</span><span>Altium</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="band contact" id="contact">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2>Tell us about your machine.</h2>
+        <p class="intro">Send a short description and a photo of the machine or panel on WhatsApp. We reply with questions or a quotation.</p>
+      </div>
+      <div class="panel">
+        <div>
+          <div class="field-label">Phone / WhatsApp</div>
+          <div class="phone-row">
+            <span class="phone" id="phone">+92 308 8312459</span>
+            <button class="copy" id="copy-phone" type="button">Copy</button>
+          </div>
+        </div>
+        <div>
+          <div class="field-label">Location</div>
+          <div>Lahore, Pakistan</div>
+        </div>
+        <div>
+          <a class="btn primary" href="https://wa.me/923088312459?text=Assalam%20o%20Alaikum%2C%20I%20need%20a%20quotation%20from%20Forgetech." target="_blank" rel="noopener">Message on WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Forgetech · Lahore, Pakistan</span>
+    <span>PLC · Embedded · Test rigs</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var btn = document.getElementById('copy-phone');
+  var phone = document.getElementById('phone');
+  btn.addEventListener('click', function () {
+    var text = phone.textContent.trim();
+    function selectFallback() {
+      var r = document.createRange(); r.selectNodeContents(phone);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      btn.textContent = 'Selected';
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () { btn.textContent = 'Copied'; }, selectFallback);
+    } catch (e) { selectFallback(); }
+    setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+  });
+})();
+</script>
+
+</body>
+</html>
