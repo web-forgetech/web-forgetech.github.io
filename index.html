@@ -20,6 +20,7 @@
   --accent: #D9500B;
   --accent-ink: #FFFFFF;
   --ok: #2E7D4F;
+  --accent2: #1E64A8;
   --stripe-dark: #1A1F24;
   --display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
   --body: "IBM Plex Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -28,13 +29,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #14171A; --surface: #1C2024; --plate: #252A2F; --ink: #E5E8EA; --muted: #97A0A8;
-    --line: #353C42; --accent: #FF6A1F; --accent-ink: #14171A; --ok: #5CC489; --stripe-dark: #0C0E10;
+    --line: #353C42; --accent: #FF6A1F; --accent-ink: #14171A; --ok: #5CC489; --stripe-dark: #0C0E10; --accent2: #6CB2F0;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #14171A; --surface: #1C2024; --plate: #252A2F; --ink: #E5E8EA; --muted: #97A0A8;
-  --line: #353C42; --accent: #FF6A1F; --accent-ink: #14171A; --ok: #5CC489; --stripe-dark: #0C0E10;
+  --line: #353C42; --accent: #FF6A1F; --accent-ink: #14171A; --ok: #5CC489; --stripe-dark: #0C0E10; --accent2: #6CB2F0;
   color-scheme: dark;
 }
 
@@ -119,6 +120,10 @@ h2 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 4.5vw
 .brands { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
 .brands span { font-family: var(--mono); font-size: 13px; padding: 6px 12px; border: 1px solid var(--line); background: var(--surface); }
 
+/* software band: second accent marks the software side */
+.services.soft { border-top-color: var(--accent2); }
+.services.soft .svc h3 { color: var(--accent2); }
+
 /* team */
 .team { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 2px solid var(--ink); border-left: 1px solid var(--line); }
 .member { padding: 22px 24px 26px; background: var(--surface); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
@@ -173,6 +178,7 @@ img { max-width: 100%; }
     </a>
     <nav class="links" aria-label="Sections">
       <a href="#services">Services</a>
+      <a href="#software">Software</a>
       <a href="#process">Process</a>
       <a href="#team">Team</a>
       <a href="#contact">Contact</a>
@@ -185,9 +191,9 @@ img { max-width: 100%; }
   <section class="hero">
     <div class="wrap">
       <div>
-        <p class="eyebrow">Industrial automation · Lahore</p>
-        <h1>Control systems, designed and wired to work.</h1>
-        <p class="lede">Forgetech builds PLC control panels, embedded electronics and test rigs for workshops and factories. We handle the whole job: sensors, wiring, programming, PC software and commissioning.</p>
+        <p class="eyebrow">Automation · Electronics · Software · Lahore</p>
+        <h1>Control systems, electronics and software that work.</h1>
+        <p class="lede">Forgetech builds PLC control panels, embedded electronics and test rigs for workshops and factories, and the software around them: PC programs, mobile apps, web scrapers and automation scripts.</p>
         <div class="ctas">
           <a class="btn primary" href="#contact">Request a quotation</a>
           <a class="btn ghost" href="#services">Our services</a>
@@ -198,12 +204,13 @@ img { max-width: 100%; }
         <div class="rivets" aria-hidden="true"></div>
         <div class="plate-head"><strong>Forgetech</strong><span>LAHORE · PK</span></div>
         <dl>
-          <dt>Type</dt><dd>Automation &amp; embedded systems</dd>
+          <dt>Type</dt><dd>Automation · embedded · software</dd>
           <dt>PLC</dt><dd>Fatek · Delta · Siemens</dd>
           <dt>HMI</dt><dd>Weintek · PC software</dd>
           <dt>Comms</dt><dd>RS-485 · Modbus RTU · Ethernet</dd>
           <dt>Signals</dt><dd>24 VDC · 4–20 mA · 0–10 V</dd>
           <dt>MCU</dt><dd>ESP32 · STM32 · Arduino</dd>
+          <dt>Software</dt><dd>Python · Scrapy · Flutter</dd>
         </dl>
         <div class="cert"><span>IEC 61131-3</span><span>LADDER</span><span>ST</span></div>
       </div>
@@ -213,7 +220,7 @@ img { max-width: 100%; }
   <section class="band" id="services">
     <div class="wrap">
       <div class="sec-head">
-        <h2>What we build</h2>
+        <h2>Industrial &amp; electronics</h2>
         <p>One team covers electrical, electronic, mechanical and software work, so a project doesn't stall between contractors.</p>
       </div>
       <div class="services">
@@ -252,6 +259,47 @@ img { max-width: 100%; }
   </section>
 
 
+  <section class="band" id="software">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Software &amp; data</h2>
+        <p>The same team writes the software around your machines and your office: programs that collect data, read documents and do repetitive work for you.</p>
+      </div>
+      <div class="services soft">
+        <article class="svc">
+          <h3>Web scraping</h3>
+          <p>Collect prices, listings, product details and reports from websites into Excel or a database, on a schedule.</p>
+          <div class="spec">Python · Scrapy · Requests · lxml</div>
+        </article>
+        <article class="svc">
+          <h3>Office automation</h3>
+          <p>Scripts that sort, merge and read PDFs and scanned documents, so repetitive office work runs by itself.</p>
+          <div class="spec">PyPDF2 · Tesseract OCR · Pillow · PowerShell</div>
+        </article>
+        <article class="svc">
+          <h3>PC &amp; SCADA software</h3>
+          <p>Windows programs that read PLCs and sensors, draw live graphs, save every run and produce reports.</p>
+          <div class="spec">Python · Modbus RTU / TCP</div>
+        </article>
+        <article class="svc">
+          <h3>Mobile apps</h3>
+          <p>Android apps that connect to your devices over Bluetooth or Wi-Fi to show readings, history and alerts.</p>
+          <div class="spec">Flutter · BLE · Wi-Fi</div>
+        </article>
+        <article class="svc">
+          <h3>Data &amp; reports</h3>
+          <p>Turn machine logs and business records into clean spreadsheets, summaries and charts you can share.</p>
+          <div class="spec">Python · Excel · CSV</div>
+        </article>
+        <article class="svc">
+          <h3>Websites</h3>
+          <p>Company websites and simple web tools, hosted free or on your own domain.</p>
+          <div class="spec">HTML · CSS · JavaScript · GitHub Pages</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
   <section class="band" id="process">
     <div class="wrap">
       <div class="sec-head">
@@ -265,7 +313,7 @@ img { max-width: 100%; }
         <li><h3>Commissioning</h3><p>Installation, calibration and operator training on site, then support after handover.</p></li>
       </ol>
       <div class="brands" aria-label="Hardware we work with">
-        <span>Fatek</span><span>Delta</span><span>Siemens</span><span>Weintek</span><span>ESP32</span><span>STM32</span><span>Modbus RTU</span><span>Altium</span>
+        <span>Fatek</span><span>Delta</span><span>Siemens</span><span>Weintek</span><span>ESP32</span><span>STM32</span><span>Modbus RTU</span><span>Altium</span><span>Python</span><span>Scrapy</span><span>Flutter</span>
       </div>
     </div>
   </section>
@@ -317,7 +365,7 @@ img { max-width: 100%; }
 <footer>
   <div class="wrap">
     <span>Forgetech · Lahore, Pakistan</span>
-    <span>PLC · Embedded · Test rigs</span>
+    <span>PLC · Embedded · Software</span>
   </div>
 </footer>
 
