@@ -119,6 +119,12 @@ h2 { font-family: var(--display); font-weight: 700; font-size: clamp(34px, 4.5vw
 .brands { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 40px; }
 .brands span { font-family: var(--mono); font-size: 13px; padding: 6px 12px; border: 1px solid var(--line); background: var(--surface); }
 
+/* team */
+.team { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 2px solid var(--ink); border-left: 1px solid var(--line); }
+.member { padding: 22px 24px 26px; background: var(--surface); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.member .role { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+.member h3 { font-family: var(--display); font-weight: 600; font-size: 25px; text-transform: uppercase; letter-spacing: 0.03em; margin: 0; line-height: 1.1; }
+
 /* contact */
 .contact { background: var(--ink); color: var(--bg); border-top: none; }
 .contact .wrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 48px; align-items: center; }
@@ -137,7 +143,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wr
 
 @media (max-width: 900px) {
   .hero .wrap, .contact .wrap, .sec-head { grid-template-columns: minmax(0, 1fr); }
-  .services { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .services, .team { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .steps li:nth-child(3) { padding-left: 0; border-left: none; }
   .log-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
@@ -169,6 +175,7 @@ img { max-width: 100%; }
       <a href="#services">Services</a>
       <a href="#projects">Projects</a>
       <a href="#process">Process</a>
+      <a href="#team">Team</a>
       <a href="#contact">Contact</a>
     </nav>
   </div>
@@ -300,6 +307,21 @@ img { max-width: 100%; }
       </ol>
       <div class="brands" aria-label="Hardware we work with">
         <span>Fatek</span><span>Delta</span><span>Siemens</span><span>Weintek</span><span>ESP32</span><span>STM32</span><span>Modbus RTU</span><span>Altium</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="team">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>Our team</h2>
+        <p>The people who plan, buy for and deliver your project.</p>
+      </div>
+      <div class="team">
+        <div class="member"><span class="role">CEO</span><h3>M. Tanveer Khan</h3></div>
+        <div class="member"><span class="role">Projects</span><h3>Muhammad Ahmed Khan</h3></div>
+        <div class="member"><span class="role">Purchasing</span><h3>Faisal</h3></div>
+        <div class="member"><span class="role">HR</span><h3>Fatmid</h3></div>
       </div>
     </div>
   </section>
