@@ -57,6 +57,8 @@ header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; 
 nav.links { display: flex; gap: 22px; flex-wrap: wrap; }
 nav.links a { text-decoration: none; font-family: var(--display); font-weight: 600; font-size: 17px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
 nav.links a:hover { color: var(--ink); }
+nav.links a.login-link { color: var(--accent); border: 2px solid var(--accent); padding: 0 10px; }
+nav.links a.login-link:hover { background: var(--accent); color: var(--accent-ink); }
 .hazard { height: 8px; background: repeating-linear-gradient(-45deg, var(--accent) 0 14px, var(--stripe-dark) 14px 28px); }
 
 /* hero */
@@ -181,6 +183,7 @@ img { max-width: 100%; }
       <a href="#process">Process</a>
       <a href="#team">Team</a>
       <a href="#contact">Contact</a>
+      <a class="login-link" href="bill.html">Login</a>
     </nav>
   </div>
   <div class="hazard" aria-hidden="true"></div>

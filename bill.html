@@ -94,6 +94,37 @@ button { font: inherit; cursor: pointer; }
 .sheet .foot { display: flex; justify-content: space-between; gap: 16px; margin: 24px 56px 0; padding: 12px 0 18px; border-top: 1px solid var(--p-line); font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; color: var(--p-grey); }
 .sheet .bar { height: 6px; background: var(--p-accent); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 
+/* ---- login + saved bills ---- */
+[hidden] { display: none !important; }
+.gate { min-height: calc(100vh - 140px); display: grid; place-items: center; padding: 24px 16px; }
+.gate .panel { width: 100%; max-width: 380px; }
+.gate p { color: var(--muted); margin: 0 0 6px; font-size: 14px; }
+.msg { font-size: 13px; margin: 10px 0 0; min-height: 1.2em; }
+.msg.err { color: #C0392B; } .msg.ok { color: var(--ok); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .msg.err { color: #FF7B6B; } :root:not([data-theme="light"]) .msg.ok { color: #5CC489; } }
+.user { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.user .btn { padding: 5px 10px; font-size: 14px; }
+.saved { max-width: 1400px; margin: 0 auto; padding: 0 24px 40px; }
+@media (max-width: 900px) { .saved { padding: 0 16px 32px; } }
+.saved .tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+.saved .tools input { max-width: 280px; }
+.seg { display: inline-flex; border: 1px solid var(--line); }
+.seg button { border: 0; background: transparent; color: var(--muted); padding: 8px 12px; font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.list-wrap { overflow-x: auto; }
+table.list { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.list th, table.list td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.list th { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+table.list td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.list td.to { white-space: normal; min-width: 140px; }
+.pill { display: inline-block; padding: 2px 8px; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; border: 1px solid currentColor; }
+.pill.paid { color: var(--ok); } .pill.due { color: var(--accent); }
+.rowbtn { border: 1px solid var(--line); background: transparent; color: var(--ink); padding: 4px 10px; font-family: var(--mono); font-size: 12px; margin-left: 4px; }
+.rowbtn:hover { border-color: var(--accent); color: var(--accent); }
+.rowbtn.danger { color: #C0392B; }
+.empty { color: var(--muted); padding: 16px 0; }
+.editing { font-family: var(--mono); font-size: 12px; color: var(--accent); margin: -8px 0 8px; }
+
 @page { size: A4; margin: 0; }
 @media print {
   body { background: #FFFFFF; }
@@ -108,12 +139,26 @@ button { font: inherit; cursor: pointer; }
 <div class="hazard no-print"></div>
 <header class="top no-print">
   <a class="brand" href="./"><span class="brand-mark"><span></span></span>Forgetech</a>
-  <span class="tag">Bill generator</span>
+  <div class="user"><span class="tag">Bill generator</span><span id="who" hidden></span><button class="btn" id="logout" type="button" hidden>Sign out</button></div>
 </header>
 
-<main>
+<section class="gate no-print" id="gate" aria-label="Staff login">
+  <form class="panel" id="loginForm">
+    <h2>Staff login</h2>
+    <p>Forgetech staff only.</p>
+    <label for="email">Email</label>
+    <input type="text" id="email" autocomplete="username" inputmode="email" required>
+    <label for="password">Password</label>
+    <input type="password" id="password" autocomplete="current-password" required style="width:100%;padding:9px 10px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line)">
+    <div class="actions"><button class="btn primary" id="loginBtn" type="submit">Sign in</button></div>
+    <p class="msg" id="loginMsg" role="status"></p>
+  </form>
+</section>
+
+<main id="app" hidden>
   <section class="panel no-print" aria-label="Bill details">
-    <h2>New bill</h2>
+    <h2 id="formTitle">New bill</h2>
+    <p class="editing" id="editing" hidden></p>
     <div class="row2">
       <div><label for="date">Bill date</label><input type="date" id="date"></div>
       <div><label for="no">Bill no.</label><input type="text" id="no"></div>
@@ -138,9 +183,11 @@ button { font: inherit; cursor: pointer; }
     <textarea id="notes" placeholder="e.g. Payment by cash or bank transfer."></textarea>
 
     <div class="actions">
-      <button class="btn primary" id="print" type="button">Print / Save PDF</button>
+      <button class="btn primary" id="save" type="button">Save bill</button>
+      <button class="btn" id="print" type="button">Print / Save PDF</button>
       <button class="btn" id="reset" type="button">New bill</button>
     </div>
+    <p class="msg" id="saveMsg" role="status"></p>
     <p class="hint">To save as PDF, choose "Save as PDF" in the print window.</p>
   </section>
 
@@ -185,7 +232,33 @@ button { font: inherit; cursor: pointer; }
   </section>
 </main>
 
-<script>
+<section class="saved no-print" id="savedSec" hidden aria-label="Saved bills">
+  <div class="panel">
+    <h2>Saved bills</h2>
+    <div class="tools">
+      <input type="text" id="search" placeholder="Search bill no. or client">
+      <div class="seg" role="group" aria-label="Filter">
+        <button type="button" data-f="all" aria-pressed="true">All</button>
+        <button type="button" data-f="due" aria-pressed="false">Unpaid</button>
+        <button type="button" data-f="paid" aria-pressed="false">Paid</button>
+      </div>
+      <span class="tag" id="sumLine"></span>
+    </div>
+    <div class="list-wrap">
+      <table class="list">
+        <thead><tr><th>Bill no.</th><th>Date</th><th>Bill to</th><th style="text-align:right">Total (Rs.)</th><th>Status</th><th></th></tr></thead>
+        <tbody id="listBody"></tbody>
+      </table>
+    </div>
+    <p class="empty" id="listEmpty" hidden>No bills yet.</p>
+  </div>
+</section>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
+const SUPABASE_URL = 'https://pjuwdfcunlbnwkfxrqir.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xByhs2AH1eT9Uz4evGxogA_NFu-dGnP'; // publishable key: safe in a web page, data is protected by row level security
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 const KEY = 'forgetech-bill-draft';
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -214,7 +287,7 @@ function words(n){
   const s = parts.join(' '); return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-let noTouched = false;
+let noTouched = false, currentId = null;
 function itemRow(it = {d:'', q:1, r:''}) {
   const row = document.createElement('div'); row.className = 'item';
   row.innerHTML = `<input type="text" aria-label="Description" value="${esc(it.d)}"><input type="number" aria-label="Quantity" min="0" step="any" value="${esc(it.q)}"><input type="number" aria-label="Rate" min="0" step="any" value="${esc(it.r)}"><button class="x" type="button" aria-label="Remove item">×</button>`;
@@ -227,7 +300,7 @@ function items() {
 }
 function state() {
   return { date:$('date').value, no:$('no').value, to:$('to').value, ref:$('ref').value, days:$('days').value,
-           paid:$('paid').checked, paidOn:$('paidOn').value, notes:$('notes').value, items:items(), noTouched };
+           paid:$('paid').checked, paidOn:$('paidOn').value, notes:$('notes').value, items:items(), noTouched, currentId };
 }
 function render() {
   const s = state();
@@ -273,11 +346,116 @@ $('paid').addEventListener('change', render);
 $('no').addEventListener('input', () => { noTouched = true; render(); });
 $('add').onclick = () => { itemRow(); render(); };
 $('print').onclick = () => window.print();
-$('reset').onclick = () => { noTouched = false; load({}); };
+$('reset').onclick = () => { noTouched = false; currentId = null; load({}); showEditing(); msg($('saveMsg'), ''); };
 
 let saved = null;
 try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
 load(saved || {});
+currentId = (saved && saved.currentId) || null; showEditing();
+
+/* ---------- Supabase: login, save, list ---------- */
+function msg(el, text, kind) { el.textContent = text; el.className = 'msg' + (kind ? ' ' + kind : ''); }
+function showEditing() {
+  $('formTitle').textContent = currentId ? 'Edit bill' : 'New bill';
+  $('editing').hidden = !currentId;
+  $('editing').textContent = currentId ? `Editing saved bill ${$('no').value}` : '';
+}
+function totalOf(its) { return its.reduce((t, it) => t + (parseFloat(it.q) || 0) * (parseFloat(it.r) || 0), 0); }
+
+async function showApp(session) {
+  const signedIn = !!session;
+  $('gate').hidden = signedIn;
+  $('logout').hidden = !signedIn; $('who').hidden = !signedIn;
+  if (!signedIn) { $('app').hidden = true; $('savedSec').hidden = true; return; }
+  $('who').textContent = session.user.email;
+  const { data: ok, error } = await sb.rpc('is_staff');
+  if (error || !ok) {
+    $('gate').hidden = false; $('app').hidden = true; $('savedSec').hidden = true;
+    msg($('loginMsg'), error ? 'Could not check access: ' + error.message : 'This account is not on the Forgetech staff list.', 'err');
+    return;
+  }
+  $('app').hidden = false; $('savedSec').hidden = false;
+  loadList();
+}
+
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('loginBtn').disabled = true; msg($('loginMsg'), 'Signing in…');
+  const { error } = await sb.auth.signInWithPassword({ email: $('email').value.trim(), password: $('password').value });
+  $('loginBtn').disabled = false;
+  if (error) msg($('loginMsg'), error.message === 'Invalid login credentials' ? 'Wrong email or password.' : error.message, 'err');
+  else { msg($('loginMsg'), ''); $('password').value = ''; }
+});
+$('logout').onclick = async () => { await sb.auth.signOut(); };
+sb.auth.onAuthStateChange((_ev, session) => { setTimeout(() => showApp(session), 0); });
+
+$('save').onclick = async () => {
+  const s = state();
+  const its = s.items.filter(it => it.d || it.r);
+  if (!s.no || !s.date) return msg($('saveMsg'), 'Bill no. and date are required.', 'err');
+  if (!its.length) return msg($('saveMsg'), 'Add at least one item.', 'err');
+  const row = { bill_no: s.no.trim(), bill_date: s.date, bill_to: s.to || null, reference: s.ref || null, items: its,
+    total: totalOf(its), pay_days: Math.max(0, parseInt(s.days || '0', 10)), paid: s.paid, paid_on: s.paid ? (s.paidOn || null) : null,
+    notes: s.notes || null, updated_at: new Date().toISOString() };
+  $('save').disabled = true; msg($('saveMsg'), 'Saving…');
+  const q = currentId ? sb.from('bills').update(row).eq('id', currentId).select('id').single()
+                      : sb.from('bills').insert(row).select('id').single();
+  const { data, error } = await q;
+  $('save').disabled = false;
+  if (error) return msg($('saveMsg'), error.code === '23505' ? `Bill no. ${row.bill_no} already exists. Change the number or open that bill from the list.` : error.message, 'err');
+  currentId = data.id; showEditing(); render();
+  msg($('saveMsg'), `Saved ${row.bill_no}.`, 'ok');
+  loadList();
+};
+
+let bills = [], filter = 'all';
+async function loadList() {
+  const { data, error } = await sb.from('bills').select('*').order('bill_date', { ascending: false }).order('created_at', { ascending: false }).limit(500);
+  if (error) { $('listEmpty').hidden = false; $('listEmpty').textContent = 'Could not load bills: ' + error.message; return; }
+  bills = data || []; drawList();
+}
+function drawList() {
+  const q = $('search').value.trim().toLowerCase();
+  const rows = bills.filter(b => (filter === 'all' || (filter === 'paid') === b.paid) &&
+    (!q || (b.bill_no || '').toLowerCase().includes(q) || (b.bill_to || '').toLowerCase().includes(q)));
+  const due = bills.filter(b => !b.paid).reduce((t, b) => t + Number(b.total), 0);
+  $('sumLine').textContent = `${bills.length} bill${bills.length === 1 ? '' : 's'} · unpaid Rs. ${money(due)}`;
+  $('listEmpty').hidden = rows.length > 0; $('listEmpty').textContent = bills.length ? 'No bills match.' : 'No bills yet.';
+  $('listBody').innerHTML = rows.map(b => `<tr>
+    <td>${esc(b.bill_no)}</td><td>${esc(fmtDate(b.bill_date))}</td><td class="to">${esc(b.bill_to || '—')}</td>
+    <td class="num">${money(Number(b.total))}</td>
+    <td>${b.paid ? `<span class="pill paid">PAID</span>` : `<span class="pill due">DUE ${esc(fmtDate(addDays(b.bill_date, b.pay_days)))}</span>`}</td>
+    <td style="text-align:right"><button class="rowbtn" data-a="open" data-id="${b.id}">Open</button>${b.paid ? '' : `<button class="rowbtn" data-a="paid" data-id="${b.id}">Mark paid</button>`}<button class="rowbtn danger" data-a="del" data-id="${b.id}">Delete</button></td>
+  </tr>`).join('');
+}
+$('search').oninput = drawList;
+document.querySelectorAll('.seg button').forEach(bt => bt.onclick = () => {
+  filter = bt.dataset.f; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === bt)); drawList();
+});
+$('listBody').addEventListener('click', async e => {
+  const bt = e.target.closest('button'); if (!bt) return;
+  const b = bills.find(x => x.id === bt.dataset.id); if (!b) return;
+  if (bt.dataset.a === 'open') {
+    noTouched = true;
+    load({ date: b.bill_date, no: b.bill_no, to: b.bill_to || '', ref: b.reference || '', days: b.pay_days, paid: b.paid,
+           paidOn: b.paid_on || '', notes: b.notes || '', items: b.items, noTouched: true });
+    currentId = b.id; showEditing(); render(); msg($('saveMsg'), '');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else if (bt.dataset.a === 'paid') {
+    bt.disabled = true;
+    const { error } = await sb.from('bills').update({ paid: true, paid_on: today(), updated_at: new Date().toISOString() }).eq('id', b.id);
+    if (error) { bt.disabled = false; alertRow(bt, error.message); return; }
+    if (currentId === b.id) { $('paid').checked = true; $('paidOn').value = today(); render(); }
+    loadList();
+  } else if (bt.dataset.a === 'del') {
+    if (bt.dataset.sure !== '1') { bt.dataset.sure = '1'; bt.textContent = 'Sure?'; setTimeout(() => { bt.dataset.sure = ''; bt.textContent = 'Delete'; }, 3000); return; }
+    const { error } = await sb.from('bills').delete().eq('id', b.id);
+    if (error) { alertRow(bt, error.message); return; }
+    if (currentId === b.id) { currentId = null; showEditing(); }
+    loadList();
+  }
+});
+function alertRow(bt, text) { bt.textContent = 'Error'; bt.title = text; }
 </script>
 </body>
 </html>
