@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Forgetech Bill Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #ECEEEF; --surface: #FFFFFF; --ink: #1A1F24; --muted: #56606A; --line: #C3CAD0;
+  --accent: #D9500B; --accent-ink: #FFFFFF; --ok: #1E7A3A; --stripe-dark: #1A1F24;
+  --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --body: 'IBM Plex Sans', 'Segoe UI', sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171A; --surface: #1C2024; --ink: #E5E8EA; --muted: #97A0A8; --line: #353C42;
+    --accent: #FF6A1F; --accent-ink: #14171A; --stripe-dark: #0C0E10;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171A; --surface: #1C2024; --ink: #E5E8EA; --muted: #97A0A8; --line: #353C42;
+  --accent: #FF6A1F; --accent-ink: #14171A; --stripe-dark: #0C0E10;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.hazard { height: 8px; background: repeating-linear-gradient(-45deg, var(--accent) 0 14px, var(--stripe-dark) 14px 28px); }
+header.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 24px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: 0.08em; text-transform: uppercase; }
+.brand-mark { width: 28px; height: 28px; background: var(--accent); display: grid; place-items: center; }
+.brand-mark span { width: 11px; height: 11px; border: 3px solid var(--accent-ink); }
+.tag { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+main { display: grid; grid-template-columns: minmax(300px, 420px) 1fr; gap: 24px; padding: 24px; max-width: 1400px; margin: 0 auto; align-items: start; }
+@media (max-width: 900px) { main { grid-template-columns: 1fr; padding: 16px; } }
+.panel { background: var(--surface); border: 1px solid var(--line); padding: 20px; }
+.panel h2 { margin: 0 0 14px; font-family: var(--display); font-weight: 700; font-size: 22px; letter-spacing: 0.06em; text-transform: uppercase; }
+.panel h3 { margin: 20px 0 8px; font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); }
+label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+input[type=text], input[type=date], input[type=number], textarea { width: 100%; padding: 9px 10px; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 0; }
+input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+textarea { resize: vertical; min-height: 60px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.item { display: grid; grid-template-columns: 1fr 64px 96px 32px; gap: 6px; margin-bottom: 6px; }
+.item input { padding: 8px; }
+.items-head { display: grid; grid-template-columns: 1fr 64px 96px 32px; gap: 6px; font-size: 12px; color: var(--muted); }
+button { font: inherit; cursor: pointer; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 16px; font-family: var(--display); font-weight: 600; font-size: 17px; letter-spacing: 0.08em; text-transform: uppercase; border: 2px solid var(--ink); background: transparent; color: var(--ink); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.btn.small { padding: 6px 12px; font-size: 15px; }
+.x { border: 1px solid var(--line); background: var(--bg); color: var(--muted); font-size: 18px; line-height: 1; }
+.x:hover { color: var(--accent); border-color: var(--accent); }
+.check { display: flex; align-items: center; gap: 8px; margin-top: 12px; color: var(--ink); font-size: 14px; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+.preview-wrap { overflow-x: auto; }
+
+/* ---- the paper (always light) ---- */
+.sheet { --p-accent: #D9500B; --p-ink: #1A1F24; --p-grey: #56606A; --p-line: #C3CAD0;
+  width: 794px; min-height: 1123px; margin: 0 auto; background: #FFFFFF; color: var(--p-ink); position: relative; display: flex; flex-direction: column; box-shadow: 0 2px 18px rgba(0,0,0,.12); font-family: var(--body); font-size: 13px; }
+.sheet .stripe { height: 10px; background: repeating-linear-gradient(-45deg, var(--p-accent) 0 14px, var(--p-ink) 14px 28px); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet .head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding: 36px 56px 18px; }
+.sheet .logo { display: flex; align-items: center; gap: 14px; }
+.sheet .logo .mark { width: 50px; height: 50px; background: var(--p-accent); display: grid; place-items: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet .logo .mark span { width: 18px; height: 18px; border: 5px solid #FFFFFF; }
+.sheet .logo .name { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: .95; letter-spacing: .08em; text-transform: uppercase; }
+.sheet .logo .sub { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--p-grey); margin-top: 3px; }
+.sheet .contact { font-family: var(--mono); font-size: 11.5px; line-height: 1.6; text-align: right; }
+.sheet .rule { margin: 0 56px; border-top: 2px solid var(--p-ink); }
+.sheet .body { padding: 22px 56px 0; flex: 1; position: relative; }
+.sheet .title { font-family: var(--display); font-weight: 700; font-size: 34px; letter-spacing: .1em; color: var(--p-accent); text-transform: uppercase; margin: 0 0 12px; }
+.sheet table { width: 100%; border-collapse: collapse; }
+.sheet td, .sheet th { border: 1px solid var(--p-line); padding: 7px 10px; text-align: left; vertical-align: top; }
+.sheet th { background: #F3F4F5; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet .det td:first-child { width: 150px; background: #F3F4F5; font-weight: 600; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet h4 { font-size: 14px; margin: 20px 0 8px; }
+.sheet .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sheet tr.total td { background: #FBE7DC; font-weight: 700; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sheet .words { margin: 10px 0 0; }
+.sheet .notes { white-space: pre-wrap; }
+.sheet .sign { display: flex; justify-content: space-between; margin: 56px 0 0; }
+.sheet .sign div { width: 220px; }
+.sheet .sign .r { text-align: right; }
+.sheet .sign .line { border-top: 1px solid var(--p-ink); margin: 40px 0 4px; }
+.sheet .sign .cap { color: var(--p-grey); font-size: 12px; }
+.sheet .stamp { position: absolute; left: 50%; bottom: 150px; transform: translateX(-50%) rotate(-10deg); border: 3px solid #1E7A3A; color: #1E7A3A; border-radius: 6px; padding: 6px 22px; text-align: center; font-family: var(--display); }
+.sheet .stamp b { display: block; font-size: 40px; letter-spacing: .12em; line-height: 1; }
+.sheet .stamp small { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; }
+.sheet .foot { display: flex; justify-content: space-between; gap: 16px; margin: 24px 56px 0; padding: 12px 0 18px; border-top: 1px solid var(--p-line); font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; color: var(--p-grey); }
+.sheet .bar { height: 6px; background: var(--p-accent); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+@page { size: A4; margin: 0; }
+@media print {
+  body { background: #FFFFFF; }
+  .no-print { display: none !important; }
+  main { display: block; padding: 0; max-width: none; }
+  .preview-wrap { overflow: visible; }
+  .sheet { box-shadow: none; margin: 0; width: 210mm; min-height: 297mm; }
+}
+</style>
+</head>
+<body>
+<div class="hazard no-print"></div>
+<header class="top no-print">
+  <a class="brand" href="./"><span class="brand-mark"><span></span></span>Forgetech</a>
+  <span class="tag">Bill generator</span>
+</header>
+
+<main>
+  <section class="panel no-print" aria-label="Bill details">
+    <h2>New bill</h2>
+    <div class="row2">
+      <div><label for="date">Bill date</label><input type="date" id="date"></div>
+      <div><label for="no">Bill no.</label><input type="text" id="no"></div>
+    </div>
+    <label for="to">Bill to</label>
+    <input type="text" id="to" placeholder="Company / client name">
+    <label for="ref">Reference (optional)</label>
+    <input type="text" id="ref" placeholder="e.g. Quotation FT-1A-A10-9">
+
+    <h3>Items</h3>
+    <div class="items-head"><span>Description</span><span>Qty</span><span>Rate (Rs.)</span><span></span></div>
+    <div id="items"></div>
+    <button class="btn small" id="add" type="button">+ Add item</button>
+
+    <h3>Payment</h3>
+    <div class="row2">
+      <div><label for="days">Pay within (days)</label><input type="number" id="days" min="0" value="3"></div>
+      <div><label for="paidOn">Paid on</label><input type="date" id="paidOn" disabled></div>
+    </div>
+    <label class="check"><input type="checkbox" id="paid"> Mark as PAID</label>
+    <label for="notes">Notes (optional)</label>
+    <textarea id="notes" placeholder="e.g. Payment by cash or bank transfer."></textarea>
+
+    <div class="actions">
+      <button class="btn primary" id="print" type="button">Print / Save PDF</button>
+      <button class="btn" id="reset" type="button">New bill</button>
+    </div>
+    <p class="hint">To save as PDF, choose "Save as PDF" in the print window.</p>
+  </section>
+
+  <section class="preview-wrap" aria-label="Bill preview">
+    <article class="sheet" id="sheet">
+      <div class="stripe"></div>
+      <div class="head">
+        <div class="logo">
+          <div class="mark"><span></span></div>
+          <div><div class="name">Forgetech</div><div class="sub">Automation · Electronics · Software</div></div>
+        </div>
+        <div class="contact">
+          <div>H.7, St. 10, Saidpur, Multan Road</div>
+          <div>Lahore, Pakistan</div>
+          <div>+92 308 8312459</div>
+          <div>amd858@gmail.com</div>
+          <div>web-forgetech.github.io</div>
+        </div>
+      </div>
+      <div class="rule"></div>
+      <div class="body">
+        <h1 class="title">Bill</h1>
+        <table class="det"><tbody id="pDet"></tbody></table>
+        <h4>Charges</h4>
+        <table>
+          <thead><tr><th style="width:36px">#</th><th>Description</th><th class="num" style="width:60px">Qty</th><th class="num" style="width:110px">Rate (Rs.)</th><th class="num" style="width:120px">Amount (Rs.)</th></tr></thead>
+          <tbody id="pItems"></tbody>
+        </table>
+        <p class="words" id="pWords"></p>
+        <h4>Payment</h4>
+        <p id="pPay" style="margin:0"></p>
+        <p class="notes" id="pNotes" style="margin:6px 0 0"></p>
+        <div class="sign">
+          <div><div id="pSignL">Received by</div><div class="line"></div><div class="cap">Name &amp; signature</div></div>
+          <div class="r"><div>For Forgetech</div><div class="line"></div><div class="cap">Authorized Signatory</div></div>
+        </div>
+        <div class="stamp" id="pStamp" hidden><b>PAID</b><small id="pStampDate"></small></div>
+      </div>
+      <div class="foot"><span>PLC &amp; control panels · Embedded systems · PCB design · Software &amp; data</span><span style="color:#D9500B;font-weight:500">FORGETECH</span></div>
+      <div class="bar"></div>
+    </article>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const KEY = 'forgetech-bill-draft';
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const fmtDate = s => { if (!s) return ''; const d = parse(s); return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; };
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate() + n); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+// FT-<year 2-digit in hex>-<month hex><month>-<day>, e.g. 22 Oct 2026 -> FT-1A-A10-22
+const billNo = s => { const d = parse(s); const y = d.getFullYear() % 100, m = d.getMonth() + 1;
+  return `FT-${y.toString(16).toUpperCase()}-${m.toString(16).toUpperCase()}${m}-${d.getDate()}`; };
+const money = n => Math.round(n).toLocaleString('en-US');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// Amount in words, Pakistani system (thousand, lakh, crore)
+const ONES = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const TENS = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function two(n){ return n < 20 ? ONES[n] : TENS[Math.floor(n/10)] + (n%10 ? '-' + ONES[n%10] : ''); }
+function three(n){ const h = Math.floor(n/100), r = n%100; return (h ? ONES[h] + ' hundred' + (r ? ' ' : '') : '') + (r ? two(r) : ''); }
+function words(n){
+  n = Math.round(n); if (n === 0) return 'Zero';
+  const parts = [], cr = Math.floor(n/1e7), lk = Math.floor(n/1e5)%100, th = Math.floor(n/1e3)%100, rest = n%1000;
+  if (cr) parts.push((cr >= 100 ? words(cr).toLowerCase() : two(cr)) + ' crore');
+  if (lk) parts.push(two(lk) + ' lakh');
+  if (th) parts.push(two(th) + ' thousand');
+  if (rest) parts.push(three(rest));
+  const s = parts.join(' '); return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+let noTouched = false;
+function itemRow(it = {d:'', q:1, r:''}) {
+  const row = document.createElement('div'); row.className = 'item';
+  row.innerHTML = `<input type="text" aria-label="Description" value="${esc(it.d)}"><input type="number" aria-label="Quantity" min="0" step="any" value="${esc(it.q)}"><input type="number" aria-label="Rate" min="0" step="any" value="${esc(it.r)}"><button class="x" type="button" aria-label="Remove item">×</button>`;
+  row.querySelector('button').onclick = () => { row.remove(); render(); };
+  row.querySelectorAll('input').forEach(i => i.oninput = render);
+  $('items').appendChild(row);
+}
+function items() {
+  return [...$('items').children].map(r => { const [d,q,rt] = r.querySelectorAll('input'); return {d:d.value, q:q.value, r:rt.value}; });
+}
+function state() {
+  return { date:$('date').value, no:$('no').value, to:$('to').value, ref:$('ref').value, days:$('days').value,
+           paid:$('paid').checked, paidOn:$('paidOn').value, notes:$('notes').value, items:items(), noTouched };
+}
+function render() {
+  const s = state();
+  if (!noTouched && s.date) { $('no').value = s.no = billNo(s.date); }
+  $('paidOn').disabled = !s.paid;
+  if (s.paid && !s.paidOn) { $('paidOn').value = s.paidOn = s.date || today(); }
+
+  const days = Math.max(0, parseInt(s.days || '0', 10));
+  const due = s.date ? addDays(s.date, days) : '';
+  const det = [['Bill no.', s.no], ['Date', fmtDate(s.date)], ['Bill to', s.to || '—']];
+  if (s.ref) det.push(['Reference', s.ref]);
+  det.push(s.paid ? ['Status', `PAID on ${fmtDate(s.paidOn)}`] : ['Payment due', `${fmtDate(due)} (within ${days} day${days===1?'':'s'})`]);
+  det.push(['From', 'Forgetech, Lahore']);
+  $('pDet').innerHTML = det.map(([a,b]) => `<tr><td>${esc(a)}</td><td>${esc(b)}</td></tr>`).join('');
+
+  let total = 0, i = 0;
+  const rows = s.items.filter(it => it.d || it.r).map(it => {
+    const q = parseFloat(it.q) || 0, r = parseFloat(it.r) || 0, a = q * r; total += a;
+    return `<tr><td>${++i}</td><td>${esc(it.d)}</td><td class="num">${esc(it.q)}</td><td class="num">${r ? money(r) : ''}</td><td class="num">${money(a)}</td></tr>`;
+  });
+  rows.push(`<tr class="total"><td></td><td colspan="3">${s.paid ? 'Total' : 'Total payable'}</td><td class="num">Rs. ${money(total)}</td></tr>`);
+  $('pItems').innerHTML = rows.join('');
+  $('pWords').textContent = `Amount in words: ${words(total)} rupees only.`;
+  $('pPay').innerHTML = s.paid
+    ? `<b>Payment received in full on ${esc(fmtDate(s.paidOn))}. Balance due: Rs. 0.</b>`
+    : `Payment within ${days} day${days===1?'':'s'} of the bill date, i.e. by <b>${esc(fmtDate(due))}</b>.`;
+  $('pNotes').textContent = s.notes;
+  $('pSignL').textContent = s.paid ? 'Paid by' : 'Received by';
+  $('pStamp').hidden = !s.paid;
+  $('pStampDate').textContent = s.paid ? `${fmtDate(s.paidOn).toUpperCase()} · FORGETECH` : '';
+  document.title = `Forgetech Bill ${s.no}`;
+  try { localStorage.setItem(KEY, JSON.stringify(state())); } catch (e) {}
+}
+function load(s) {
+  $('date').value = s.date || today(); $('no').value = s.no || ''; $('to').value = s.to || ''; $('ref').value = s.ref || '';
+  $('days').value = s.days ?? 3; $('paid').checked = !!s.paid; $('paidOn').value = s.paidOn || ''; $('notes').value = s.notes || '';
+  noTouched = !!s.noTouched; $('items').innerHTML = '';
+  (s.items && s.items.length ? s.items : [{d:'', q:1, r:''}]).forEach(itemRow);
+  render();
+}
+['date','to','ref','days','paid','paidOn','notes'].forEach(id => $(id).addEventListener('input', render));
+$('paid').addEventListener('change', render);
+$('no').addEventListener('input', () => { noTouched = true; render(); });
+$('add').onclick = () => { itemRow(); render(); };
+$('print').onclick = () => window.print();
+$('reset').onclick = () => { noTouched = false; load({}); };
+
+let saved = null;
+try { saved = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) {}
+load(saved || {});
+</script>
+</body>
+</html>
